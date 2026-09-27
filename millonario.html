@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dengue Millonario</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito:wght@600;700;800&family=Roboto:wght@400;500;700;900&family=Gochi+Hand&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0B192C; --navy2:#071122; --deep:#02040A; --panel:#0E2340; --line:#1E3A63;
+  --gold:#F59E0B; --gold2:#FBBF24; --gold-lt:#FDE68A; --amber:#D97706;
+  --ok:#15803D; --bad:#B91C1C; --blood:#E11D48; --water:#38BDF8;
+  --paper:#FFFBF3; --ink:#1F2A1E; --ink2:#4E5A4B; --green-dk:#1E5B24;
+  --show:'Roboto',system-ui,sans-serif; --display:'Baloo 2','Trebuchet MS',system-ui,sans-serif; --body:'Nunito','Segoe UI',system-ui,sans-serif; --hand:'Gochi Hand','Comic Sans MS',cursive;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:inherit}
+html,body{margin:0}
+[hidden]{display:none !important}
+body{background:#02040A;color:var(--ink);font-family:var(--body);overflow-x:hidden}
+img{max-width:100%;display:block}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--gold2);outline-offset:3px;border-radius:10px}
+.wrap{width:min(1180px,100% - 40px);margin-inline:auto}
+
+/* rayas del Aedes aegypti: blanco y negro */
+.stripes{background-image:repeating-linear-gradient(-45deg,#fff 0 10px,#0B0B0B 10px 20px)}
+
+/* ---------- sección del landing ---------- */
+.bar{display:flex;align-items:center;justify-content:space-between;height:96px}
+.bar img{width:160px}
+.bar a{height:46px;padding:0 24px;border-radius:999px;background:#3E9A38;color:#fff;font-family:var(--display);font-weight:700;font-size:18px;display:inline-flex;align-items:center;text-decoration:none}
+.hand-t{font-family:var(--hand);font-size:28px;color:#FF7A59;text-align:center;display:block}
+.sec-title{font-family:var(--display);font-weight:800;font-size:clamp(34px,4.2vw,52px);color:var(--green-dk);text-align:center;margin:0 0 30px;line-height:1.05}
+.teaser{position:relative;border-radius:40px;overflow:hidden;background:radial-gradient(circle at 70% 40%,#123056 0%,var(--navy) 45%,var(--deep) 100%);color:#fff;display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:center;padding:0 56px 0 0;min-height:440px;box-shadow:0 26px 60px rgba(2,4,10,.35);margin-bottom:90px}
+.teaser .band{position:absolute;left:0;right:0;top:0;height:12px}
+.teaser .band.b{top:auto;bottom:0}
+.teaser .art{position:relative;height:440px}
+.teaser .art img.bg{position:absolute;left:-6%;top:6%;width:100%;filter:drop-shadow(0 20px 30px rgba(0,0,0,.5))}
+.teaser .art .coin{position:absolute;right:6%;bottom:12%;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FDE68A,#F59E0B 55%,#B45309);display:grid;place-items:center;text-align:center;font-family:var(--show);font-weight:900;color:#3B2300;font-size:20px;line-height:1.05;box-shadow:0 0 50px rgba(245,158,11,.55),inset 0 -6px 0 rgba(0,0,0,.2);transform:rotate(-8deg);animation:bob 4s ease-in-out infinite}
+@keyframes bob{0%,100%{translate:0 0}50%{translate:0 -10px}}
+.logo-show{display:flex;align-items:center;gap:12px;font-family:var(--show);font-weight:900;letter-spacing:4px;color:var(--gold);font-size:clamp(28px,3.4vw,44px);line-height:1;text-shadow:0 0 24px rgba(245,158,11,.45)}
+.logo-show img{width:64px;height:64px;object-fit:contain;padding:6px;border-radius:50%;background:#FFFBF3;box-shadow:0 0 0 3px var(--gold),0 0 18px rgba(245,158,11,.5)}
+.teaser p{margin:16px 0 22px;font-size:18px;font-weight:700;line-height:1.6;color:#C7D6EE;max-width:44ch}
+.chips{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:26px}
+.chips span{padding:8px 14px;border-radius:999px;border:1px solid rgba(245,158,11,.5);color:var(--gold-lt);font-weight:800;font-size:14px;background:rgba(245,158,11,.08)}
+.cta{display:inline-flex;align-items:center;gap:12px;height:62px;padding:0 34px;border:0;border-radius:999px;background:linear-gradient(180deg,var(--gold2),var(--amber));color:#1F1300;font-family:var(--show);font-weight:900;letter-spacing:1px;font-size:20px;box-shadow:0 0 0 0 rgba(245,158,11,.5);animation:ring 2.2s ease-out infinite}
+@keyframes ring{0%{box-shadow:0 0 0 0 rgba(245,158,11,.55)}100%{box-shadow:0 0 0 22px rgba(245,158,11,0)}}
+
+/* ---------- juego ---------- */
+.game{position:fixed;inset:0;z-index:50;display:none;overflow:auto;color:#fff;font-family:var(--show);background:radial-gradient(circle at center,var(--navy) 0%,var(--deep) 100%)}
+.game.open{display:block}
+.game::before{content:"";position:fixed;inset:0;pointer-events:none;background:conic-gradient(from 200deg at 50% -10%,transparent 0deg,rgba(56,189,248,.10) 12deg,transparent 24deg,transparent 60deg,rgba(245,158,11,.08) 72deg,transparent 84deg,transparent 120deg,rgba(56,189,248,.08) 132deg,transparent 144deg);animation:beams 14s ease-in-out infinite alternate}
+@keyframes beams{to{transform:rotate(8deg)}}
+.flyer{position:fixed;width:80px;opacity:.16;filter:invert(1);pointer-events:none;animation:drift 16s ease-in-out infinite}
+@keyframes drift{0%,100%{translate:0 0;rotate:-6deg}50%{translate:60px -40px;rotate:8deg}}
+.g-in{position:relative;min-height:100%;max-width:1240px;margin:0 auto;padding:0 24px 28px;display:grid;grid-template-columns:1fr 280px;gap:26px;align-content:start}
+.g-band{grid-column:1 / -1;height:8px;margin:0 -24px}
+.g-top{grid-column:1 / -1;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1px solid rgba(30,58,99,.7)}
+.g-top .logo-show{font-size:24px;letter-spacing:3px}
+.g-top .logo-show img{width:46px;height:46px;padding:5px}
+.tools{display:flex;gap:10px;align-items:center}
+.life{position:relative;width:78px;height:52px;border-radius:50%;border:2px solid var(--gold);background:radial-gradient(circle at 50% 30%,#1B3B6A,#0B1F3C);color:var(--gold2);font-weight:900;font-size:16px;letter-spacing:.5px;display:grid;place-items:center;transition:transform .2s ease,background .2s ease}
+.life:hover:not(:disabled){transform:translateY(-2px);background:var(--gold);color:#1F1300}
+.life:disabled{opacity:.35;cursor:not-allowed}
+.life:disabled::after{content:"";position:absolute;left:8px;right:8px;top:50%;height:3px;background:var(--bad);transform:rotate(-20deg);border-radius:2px}
+.icon-btn{width:46px;height:46px;border-radius:12px;border:1px solid var(--line);background:rgba(14,35,64,.8);color:#fff;font-size:18px;display:grid;place-items:center}
+.main{display:flex;flex-direction:column;gap:18px;padding-top:22px}
+.stage-art{display:flex;justify-content:center;height:120px;position:relative}
+.stage-art img{height:120px;width:auto;filter:drop-shadow(0 10px 20px rgba(0,0,0,.6))}
+/* caja de pregunta con forma hexagonal y línea del show */
+.rail{position:relative}
+.rail::before{content:"";position:absolute;left:-24px;right:-24px;top:50%;height:2px;background:linear-gradient(90deg,transparent,var(--gold) 12%,var(--gold) 88%,transparent);opacity:.6}
+.qhex{position:relative;padding:3px;background:linear-gradient(90deg,var(--gold),var(--gold-lt),var(--gold));clip-path:polygon(3% 0,97% 0,100% 50%,97% 100%,3% 100%,0 50%)}
+.qhex > div{clip-path:polygon(3% 0,97% 0,100% 50%,97% 100%,3% 100%,0 50%);background:linear-gradient(180deg,#123056,#0A1C36);min-height:140px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:22px 7%}
+.qlvl{font-size:13px;font-weight:700;letter-spacing:3px;color:var(--gold2);margin-bottom:8px}
+.q{margin:0;font-size:clamp(19px,2.2vw,26px);font-weight:500;line-height:1.4}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:14px 18px}
+.opt-wrap{position:relative}
+.opt-wrap::before{content:"";position:absolute;left:-18px;right:-18px;top:50%;height:2px;background:var(--gold);opacity:.45}
+.opt{position:relative;width:100%;padding:3px;border:0;background:var(--gold);clip-path:polygon(5% 0,95% 0,100% 50%,95% 100%,5% 100%,0 50%);color:#E5EDF8;text-align:left;transition:transform .15s ease}
+.opt > span{clip-path:polygon(5% 0,95% 0,100% 50%,95% 100%,5% 100%,0 50%);display:flex;align-items:center;gap:12px;min-height:64px;padding:10px 7%;background:linear-gradient(180deg,#123056,#0A1C36);font-weight:500;font-size:17px;line-height:1.3;transition:background .2s ease,color .2s ease}
+.opt b{color:var(--gold2);font-weight:900;font-size:19px}
+.opt:hover:not(:disabled) > span{background:var(--amber);color:#fff}
+.opt:hover:not(:disabled) b{color:#fff}
+.opt.gone{visibility:hidden}
+.opt.pick > span{background:var(--amber);color:#fff;animation:blink .35s steps(2) infinite}
+.opt.pick b{color:#fff}
+@keyframes blink{50%{background:#B45309}}
+.opt.ok{background:#4ADE80}
+.opt.ok > span{background:var(--ok);color:#fff;animation:pulse .5s infinite alternate}
+.opt.ok b{color:#fff}
+@keyframes pulse{to{transform:scale(1.02)}}
+.opt.bad{background:#FCA5A5}
+.opt.bad > span{background:var(--bad);color:#fff}
+.opt.bad b{color:#fff}
+.explain{display:none;gap:16px;align-items:flex-start;padding:18px 20px;border-radius:16px;background:#0F172A;border:1px solid #1D4ED8;color:#CBD5E1;font-size:15px;line-height:1.6}
+.explain.show{display:flex;animation:pop .3s ease}
+@keyframes pop{from{opacity:0;translate:0 8px}}
+.explain .ic{flex-shrink:0;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-size:22px}
+.explain .ic.okc{background:rgba(21,128,61,.3)}
+.explain .ic.badc{background:rgba(185,28,28,.3)}
+.explain strong{color:#fff}
+.explain .next{margin-left:auto;align-self:center;flex-shrink:0;height:48px;padding:0 22px;border:0;border-radius:8px;background:var(--gold);color:#1F1300;font-weight:900;letter-spacing:.5px}
+.ladder{margin-top:22px;align-self:start;border-radius:14px;background:rgba(11,31,60,.55);border:1px solid rgba(30,58,99,.8);padding:14px;display:flex;flex-direction:column-reverse;gap:3px;font-weight:700;font-size:14px}
+.ladder div{display:flex;justify-content:space-between;padding:5px 12px;border-radius:6px;color:#64748B}
+.ladder div.safe{color:#E2E8F0;border-left:4px solid var(--gold2)}
+.ladder div.done{color:var(--gold)}
+.ladder div.now{background:var(--gold);color:#111;animation:nowp 1.2s ease-in-out infinite}
+@keyframes nowp{50%{background:var(--gold2)}}
+.ladder .top-prize{order:99;display:flex;align-items:center;justify-content:center;gap:8px;padding:6px 0 10px;color:var(--gold2);font-weight:900;letter-spacing:2px;font-size:13px}
+/* público */
+.modal{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;background:rgba(2,4,10,.75);padding:20px}
+.modal.show{display:flex}
+.modal .box{width:min(460px,100%);border-radius:18px;border:2px solid var(--gold);background:linear-gradient(180deg,#123056,#0A1C36);padding:24px;text-align:center}
+.modal h3{margin:0 0 18px;font-weight:900;letter-spacing:2px;color:var(--gold2)}
+.bars{display:flex;justify-content:space-around;align-items:flex-end;height:180px;margin-bottom:18px}
+.bars div{display:flex;flex-direction:column;align-items:center;gap:6px;font-weight:900}
+.bars i{display:block;width:44px;border-radius:6px 6px 0 0;background:linear-gradient(180deg,var(--gold2),var(--amber));height:0;transition:height .9s cubic-bezier(.2,.8,.2,1)}
+.bars small{color:#CBD5E1;font-weight:700}
+.modal button{height:44px;padding:0 24px;border:0;border-radius:8px;background:var(--gold);color:#1F1300;font-weight:900}
+/* pantallas */
+.screen{display:none;grid-column:1 / -1;place-items:center;text-align:center;padding:40px 10px}
+.screen.show{display:grid}
+.screen .card{max-width:620px;display:flex;flex-direction:column;align-items:center;gap:16px}
+.screen h2{margin:0;font-weight:900;letter-spacing:1px;font-size:clamp(30px,4.4vw,48px);line-height:1.05}
+.screen h2 span{color:var(--gold2)}
+.screen p{margin:0;font-size:17px;line-height:1.6;color:#C7D6EE}
+.prize{font-weight:900;font-size:clamp(40px,6vw,64px);color:var(--gold2);text-shadow:0 0 30px rgba(245,158,11,.5)}
+.row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.btn-g{height:56px;padding:0 28px;border:0;border-radius:999px;background:linear-gradient(180deg,var(--gold2),var(--amber));color:#1F1300;font-weight:900;font-size:18px;text-decoration:none;display:inline-flex;align-items:center}
+.btn-o{text-decoration:none;height:56px;padding:0 26px;border-radius:999px;border:2px solid rgba(255,255,255,.35);background:transparent;color:#fff;font-weight:700;font-size:17px;display:inline-flex;align-items:center}
+.puff{position:fixed;width:200px;z-index:60;pointer-events:none;animation:puff 1s ease-out forwards}
+@keyframes puff{0%{opacity:0;scale:.4}25%{opacity:1;scale:1}100%{opacity:0;scale:1.25}}
+.confetti{position:fixed;top:-20px;width:10px;height:16px;z-index:80;pointer-events:none;animation:fall linear forwards}
+@keyframes fall{to{translate:var(--dx) 110vh;rotate:720deg}}
+
+@media (max-width:900px){
+  .teaser{grid-template-columns:1fr;padding:30px 24px 40px}
+  .teaser .art{height:260px}
+  .g-in{grid-template-columns:minmax(0,1fr);padding:0 14px 20px}
+  .main{min-width:0}
+  .g-band{order:-3}
+  .g-top{order:-2;flex-wrap:wrap}
+  .g-top .logo-show span{display:none}
+  .g-band{margin:0 -14px}
+  .g-top .logo-show{font-size:15px;letter-spacing:1px}
+  .g-top .logo-show img{width:36px;height:36px;padding:4px}
+  .life{width:62px;height:44px;font-size:13px}
+  .opts{grid-template-columns:minmax(0,1fr)}
+  .rail::before,.opt-wrap::before{display:none}
+  .qhex > div{padding:18px 8%}
+  .stage-art{display:none}
+  .ladder{order:-1;min-width:0;margin-top:10px;flex-direction:row-reverse;overflow-x:auto;padding:8px;gap:4px}
+  .ladder div{flex-shrink:0;padding:6px 10px}
+  .ladder div span:last-child,.ladder .top-prize{display:none}
+  .explain{flex-wrap:wrap}
+  .explain .next{margin-left:0;width:100%}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none !important;transition:none !important}}
+</style>
+</head>
+<body>
+
+<div class="game" id="game" role="dialog" aria-modal="true" aria-label="Dengue Millonario">
+  <img class="flyer" src="/landing/zancudo_1.png" alt="" style="left:4%;top:18%">
+  <img class="flyer" src="/landing/zancudo_2.png" alt="" style="right:22%;top:70%;width:60px;animation-delay:-6s">
+  <img class="flyer" src="/landing/zancudo_1.png" alt="" style="left:40%;top:82%;width:56px;animation-delay:-10s">
+  <div class="g-in">
+    <div class="g-band stripes" aria-hidden="true"></div>
+    <div class="g-top">
+      <div class="logo-show"><img src="/landing/zancudo_1.png" alt="">DENGUE MILLONARIO</div>
+      <div class="tools">
+        <button class="life" type="button" id="btn-5050" aria-label="Comodín 50:50">50:50</button>
+        <button class="life" type="button" id="btn-audience" aria-label="Comodín del público">Público</button>
+        <button class="icon-btn" type="button" id="mute" aria-label="Silenciar sonido">🔊</button>
+        <button class="icon-btn" type="button" id="close" aria-label="Cerrar juego">✕</button>
+      </div>
+    </div>
+
+    <div class="main" id="main">
+      <div class="stage-art" aria-hidden="true"><img src="/landing/we_want_image.webp" alt=""></div>
+      <div class="rail"><div class="qhex"><div><div class="qlvl" id="qlvl"></div><p class="q" id="question-text" aria-live="polite">Cargando pregunta...</p></div></div></div>
+      <div class="opts" id="options-container"></div>
+      <div class="explain" id="explanation-box" role="status"><span class="ic" id="ex-ic"></span><div id="explanation-text"></div><button class="next" type="button" id="next-btn">Siguiente Nivel ➔</button></div>
+    </div>
+    <div class="ladder" id="ladder" aria-label="Escalera de premios"></div>
+
+    <section class="screen" id="end">
+      <div class="card">
+        <span id="end-emoji" style="font-size:64px"></span>
+        <h2 id="end-title"></h2>
+        <div class="prize" id="end-prize"></div>
+        <p id="end-msg"></p>
+        <div class="row">
+          <button class="btn-g" type="button" id="again">🔄 Reiniciar juego</button>
+          <a class="btn-o" href="/login" target="_top">Entrar a la plataforma →</a>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div class="modal" id="audience" role="dialog" aria-modal="true" aria-label="Resultados del público">
+  <div class="box"><h3>RESULTADOS DEL PÚBLICO</h3><div class="bars" id="bars"></div><button type="button" id="aud-close">Cerrar</button></div>
+</div>
+
+<script>
+(function(){
+  // Preguntas originales de "Dengue Millonario" (sin cambios en el texto).
+  var questions = [
+ {
+  "q": "1. ¿Cuál es el principal mosquito vector transmisor del virus del dengue?",
+  "options": [
+   "Anopheles gambiae",
+   "Aedes aegypti",
+   "Culex pipiens",
+   "Aedes albopictus"
+  ],
+  "correct": 1,
+  "explanation": "El principal vector del dengue es el mosquito Aedes aegypti. Aunque Aedes albopictus también puede transmitirlo, A. aegypti está sumamente adaptado a entornos urbanos."
+ },
+ {
+  "q": "2. ¿Qué tipo de agente patógeno causa el dengue?",
+  "options": [
+   "Una bacteria Gram negativa",
+   "Un parásito protozoario",
+   "Un virus ARN (Flaviviridae)",
+   "Un hongo esporulado"
+  ],
+  "correct": 2,
+  "explanation": "El dengue es provocado por un virus del género Flavivirus (familia Flaviviridae), el cual posee material genético tipo ARN monocatenario."
+ },
+ {
+  "q": "3. ¿Cuántos serotipos distintos existen del virus del dengue?",
+  "options": [
+   "2 serotipos",
+   "4 serotipos",
+   "6 serotipos",
+   "8 serotipos"
+  ],
+  "correct": 1,
+  "explanation": "Existen 4 serotipos principales (DENV-1, DENV-2, DENV-3 y DENV-4). La infección por uno proporciona inmunidad de por vida contra ese serotipo específico, pero no contra los demás."
+ },
+ {
+  "q": "4. ¿Cuál es una característica física clave del mosquito Aedes aegypti adulto?",
+  "options": [
+   "Alas de color verde brillante",
+   "Manchas blancas en patas y tórax",
+   "Cuerpo completamente negro sin marcas",
+   "Antenas gigantes en forma de abanico"
+  ],
+  "correct": 1,
+  "explanation": "Se reconoce fácilmente por presentar marcas blancas en forma de lira en el tórax y bandas blancas en las patas."
+ },
+ {
+  "q": "5. ¿Cuál es el síntoma característico que le da el nombre popular de 'fiebre quebrantahuesos'?",
+  "options": [
+   "Rigidez muscular permanente",
+   "Severo dolor articular y muscular",
+   "Fracturas espontáneas",
+   "Pérdida de la densidad ósea"
+  ],
+  "correct": 1,
+  "explanation": "Se le conoce como 'fiebre quebrantahuesos' debido al intenso dolor muscular (mialgias) y articular (artralgias) que genera en los pacientes."
+ },
+ {
+  "q": "6. ¿En qué momento del día suelen morder con mayor frecuencia las hembras de Aedes aegypti?",
+  "options": [
+   "Únicamente en la medianoche",
+   "Durante las primeras horas de la mañana y al atardecer",
+   "Durante la siesta al mediodía",
+   "Son estrictamente nocturnos"
+  ],
+  "correct": 1,
+  "explanation": "Aedes aegypti tiene hábitos de picadura fundamentalmente diurnos, con picos de actividad al amanecer y antes del anochecer."
+ },
+ {
+  "q": "7. ¿Qué complicación fisiopatológica principal distingue al dengue grave del dengue sin signos de alarma?",
+  "options": [
+   "Fallo hepático fulminante inmediato",
+   "Extravasación grave de plasma sanguíneo",
+   "Infección bacteriana secundaria generalizada",
+   "Trombosis venosa profunda masiva"
+  ],
+  "correct": 1,
+  "explanation": "La alteración fisiopatológica central del dengue grave es el aumento de la permeabilidad vascular, lo que produce una fuga o extravasación de plasma que puede llevar al choque e insuficiencia orgánica."
+ },
+ {
+  "q": "8. ¿Por qué se contraindica el uso de Aspirina e Ibuprofeno durante la fase febril del dengue?",
+  "options": [
+   "Provocan falla renal instantánea",
+   "Aumentan el riesgo de hemorragias por su efecto antiagregante",
+   "Neutralizan los anticuerpos naturales",
+   "Causan erupciones cutáneas permanentes"
+  ],
+  "correct": 1,
+  "explanation": "Los AINEs (como aspirina, ibuprofeno y naproxeno) inhiben la función plaquetaria y pueden lesionar la mucosa gástrica, incrementando significativamente el riesgo de sangrado."
+ },
+ {
+  "q": "9. ¿Cuál de los siguientes es un claro 'signo de alarma' que presagia el desarrollo de dengue grave?",
+  "options": [
+   "Dolor abdominal intenso y continuo",
+   "Aumento progresivo del apetito",
+   "Estornudos frecuentes",
+   "Estreñimiento leve"
+  ],
+  "correct": 0,
+  "explanation": "El dolor abdominal intenso y continuo, vómitos persistentes, acumulación de líquidos y sangrado de mucosas son signos de alarma fundamentales que exigen atención médica inmediata."
+ },
+ {
+  "q": "10. ¿En qué fase de la enfermedad suele manifestarse el mayor riesgo de extravasación de plasma y choque?",
+  "options": [
+   "En el primer día de fiebre",
+   "En la fase crítica (al descender la fiebre)",
+   "Durante la fase de recuperación tardía",
+   "Semanas después del inicio de síntomas"
+  ],
+  "correct": 1,
+  "explanation": "La fase crítica ocurre habitualmente entre los días 3 y 7 de la enfermedad, coincidiendo con el descenso de la fiebre (defervescencia). Es aquí donde puede desencadenarse el choque por fuga plasmática."
+ },
+ {
+  "q": "11. ¿Qué prueba serológica/diagnóstica detecta directamente la proteína del virus durante los primeros 5 días de síntomas?",
+  "options": [
+   "Antígeno NS1",
+   "Anticuerpos IgG",
+   "Prueba de Coombs direct",
+   "Reacción de VDRL"
+  ],
+  "correct": 0,
+  "explanation": "La prueba de antígeno NS1 permite detectar la proteína no estructural del virus en sangre durante la fase agudamente febril (días 1 a 5)."
+ },
+ {
+  "q": "12. ¿Qué fenómeno inmunológico explica por qué una segunda infección con un serotipo diferente puede ser más grave?",
+  "options": [
+   "Inmunidad cruzada esterilizante",
+   "Amplificación dependiente de anticuerpos (ADE)",
+   "Tolerancia inmune adquirida",
+   "Resistencia microbiana a antivirales"
+  ],
+  "correct": 1,
+  "explanation": "El fenómeno de ADE (Antibody-Dependent Enhancement) ocurre cuando los anticuerpos preexistentes heterólogos no neutralizan al nuevo serotipo, sino que facilitan la entrada del virus a las células diana, aumentando la carga viral."
+ },
+ {
+  "q": "13. ¿Cuál es el tratamiento médico pilar fundamental para el manejo del dengue en su fase aguda?",
+  "options": [
+   "Tratamiento prolongado con antibióticos",
+   "Corticoides sistémicos a dosis altas",
+   "Hidratación adecuada (oral o intravenosa)",
+   "Antivirales específicos de amplio espectro"
+  ],
+  "correct": 2,
+  "explanation": "No existe un antiviral específico aprobado de uso general. El pilar del tratamiento es el reemplazo de líquidos y soporte hidroelectrolítico cuidadoso para prevenir o revertir el choque."
+ },
+ {
+  "q": "14. ¿Cuál es el método preventivo ambiental más efectivo para interrumpir el ciclo reproductivo del vector?",
+  "options": [
+   "Uso individual de suplementos de vitamina B",
+   "Eliminación y control de criaderos de agua limpia estancada",
+   "Fumigación química continua cada 2 horas",
+   "Plantar eucaliptos cerca de las viviendas"
+  ],
+  "correct": 1,
+  "explanation": "Aedes aegypti se reproduce en recipientes artificiales con agua limpia o относительно limpia. La eliminación física de criaderos (tanques, llantas, floreros) es la medida preventiva clave a nivel comunitario."
+ },
+ {
+  "q": "15. ¿Cuál es el nombre de la vacuna tetravalente atenuada contra el dengue recomendada por la OMS bajo criterios específicos de seropositividad o carga epidemiológica alta?",
+  "options": [
+   "Mosquirix",
+   "Qdenga (TAK-003) / Dengvaxia",
+   "ChAdOx1",
+   "Sputnik V"
+  ],
+  "correct": 1,
+  "explanation": "Dengvaxia (CYD-TDV) y Qdenga (TAK-003) son vacunas desarrolladas contra el dengue. Qdenga está aprobada en diversos países para la prevención de la enfermedad por cualquiera de los 4 serotipos."
+ }
+];
+  var moneyLadder = ["$100","$200","$300","$500","$1,000","$2,000","$4,000","$8,000","$16,000","$32,000","$64,000","$125,000","$250,000","$500,000","$1,000,000"];
+  var SAFE = [4, 9, 14];
+  var AEROSOL = '/landing/aerosol.svg';
+  var $ = function(id){ return document.getElementById(id); };
+  var game = $('game'), box = $('options-container');
+  var level = 0, order = [], used5050 = false, usedAudience = false, locked = false, muted = false, lastFocus = null;
+
+  // --- sonidos (mismos del juego original) ---
+  var ctx = null;
+  function ac(){ try { ctx = ctx || new (window.AudioContext || window.webkitAudioContext)(); if (ctx.state === 'suspended') ctx.resume(); } catch(e){} return ctx; }
+  function playSound(type){
+    var c = ac(); if (!c || muted) return;
+    var now = c.currentTime, osc = c.createOscillator(), gain = c.createGain(); osc.connect(gain); gain.connect(c.destination);
+    if (type === 'select') { osc.type='sine'; osc.frequency.setValueAtTime(150,now); osc.frequency.exponentialRampToValueAtTime(300,now+0.8); gain.gain.setValueAtTime(0.3,now); gain.gain.exponentialRampToValueAtTime(0.01,now+0.8); osc.start(now); osc.stop(now+0.8); }
+    else if (type === 'correct') { [261.63,329.63,392,523.25].forEach(function(f,i){ var o=c.createOscillator(), g=c.createGain(); o.connect(g); g.connect(c.destination); o.type='triangle'; o.frequency.setValueAtTime(f,now+i*0.08); g.gain.setValueAtTime(0.2,now+i*0.08); g.gain.exponentialRampToValueAtTime(0.001,now+1.2); o.start(now+i*0.08); o.stop(now+1.2); }); }
+    else if (type === 'wrong') { osc.type='sawtooth'; osc.frequency.setValueAtTime(150,now); osc.frequency.exponentialRampToValueAtTime(60,now+0.6); gain.gain.setValueAtTime(0.4,now); gain.gain.exponentialRampToValueAtTime(0.01,now+0.6); osc.start(now); osc.stop(now+0.6); }
+    else if (type === 'spray') { var n=c.sampleRate*0.35, b=c.createBuffer(1,n,c.sampleRate), d=b.getChannelData(0); for (var i=0;i<n;i++) d[i]=Math.random()*2-1; var s=c.createBufferSource(); s.buffer=b; var hp=c.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=3000; var g2=c.createGain(); g2.gain.setValueAtTime(0.25,now); g2.gain.exponentialRampToValueAtTime(0.0001,now+0.35); s.connect(hp).connect(g2).connect(c.destination); s.start(); }
+  }
+
+  function renderLadder(){
+    var el = $('ladder');
+    el.innerHTML = '<div class="top-prize">🏆 EL MILLÓN</div>' + moneyLadder.map(function(m,i){
+      var cls = [SAFE.indexOf(i) > -1 ? 'safe' : '', i === level ? 'now' : (i < level ? 'done' : '')].join(' ');
+      return '<div class="'+cls+'"><span>'+(i+1)+'</span><span>'+m+'</span></div>';
+    }).join('');
+  }
+  // Las opciones se muestran en orden aleatorio para que la correcta no quede siempre en la misma letra.
+  function shuffle(n){ var a=[]; for (var i=0;i<n;i++) a.push(i); for (var j=a.length-1;j>0;j--){ var k=Math.floor(Math.random()*(j+1)); var t=a[j]; a[j]=a[k]; a[k]=t; } return a; }
+  function loadQuestion(){
+    var q = questions[level]; locked = false;
+    $('qlvl').textContent = 'PREGUNTA ' + (level+1) + ' · POR ' + moneyLadder[level];
+    $('question-text').textContent = q.q;
+    $('explanation-box').classList.remove('show');
+    order = shuffle(q.options.length);
+    box.innerHTML = order.map(function(orig, pos){
+      return '<div class="opt-wrap"><button class="opt" type="button" data-orig="'+orig+'"><span><b>'+String.fromCharCode(65+pos)+':</b> '+q.options[orig]+'</span></button></div>';
+    }).join('');
+    renderLadder();
+  }
+  box.addEventListener('click', function(e){
+    var btn = e.target.closest('.opt'); if (!btn || locked) return;
+    locked = true; playSound('select');
+    box.querySelectorAll('.opt').forEach(function(b){ b.disabled = true; });
+    btn.classList.add('pick');
+    setTimeout(function(){ check(btn); }, 1200);
+  });
+  function check(btn){
+    var q = questions[level], ok = +btn.dataset.orig === q.correct;
+    btn.classList.remove('pick');
+    var correctBtn = box.querySelector('.opt[data-orig="'+q.correct+'"]');
+    var letter = String.fromCharCode(65 + order.indexOf(q.correct));
+    if (ok) { playSound('correct'); btn.classList.add('ok'); explain('¡Correcto!', q.explanation, false); }
+    else { playSound('wrong'); btn.classList.add('bad'); correctBtn.classList.add('ok'); explain('Incorrecto. La respuesta correcta era la ' + letter + '.', q.explanation, true); }
+  }
+  function explain(head, text, over){
+    $('ex-ic').className = 'ic ' + (over ? 'badc' : 'okc'); $('ex-ic').textContent = over ? '✖' : '✔';
+    $('explanation-text').innerHTML = ''; var s = document.createElement('strong'); s.textContent = head + ' '; $('explanation-text').appendChild(s); $('explanation-text').appendChild(document.createTextNode(text));
+    var nb = $('next-btn');
+    if (over) { nb.textContent = 'Ver resultado ➔'; nb.onclick = function(){ end(false); }; }
+    else if (level === questions.length - 1) { nb.textContent = '¡RECLAMAR EL MILLÓN! 🏆'; nb.onclick = function(){ end(true); }; }
+    else { nb.textContent = 'Siguiente Nivel ➔'; nb.onclick = function(){ level++; loadQuestion(); }; }
+    $('explanation-box').classList.add('show'); nb.focus({preventScroll:true});
+  }
+  function end(won){
+    $('main').hidden = true; $('ladder').hidden = true; $('end').classList.add('show');
+    var kept = '$0'; SAFE.forEach(function(s){ if (level > s) kept = moneyLadder[s]; });
+    if (won) {
+      $('end-emoji').textContent = '🏆'; $('end-title').innerHTML = '¡FELICIDADES! <span>Conquistaste el millón</span>';
+      $('end-prize').textContent = '$1,000,000'; $('end-msg').textContent = 'Te has convertido en experto contra el dengue. Ahora ayuda a proteger a tu familia y a tu barrio.';
+      confetti(120);
+    } else {
+      $('end-emoji').textContent = '🦟'; $('end-title').innerHTML = 'El zancudo <span>te ganó esta vez</span>';
+      $('end-prize').textContent = kept; $('end-msg').textContent = 'Llegaste hasta la pregunta ' + (level+1) + '. Te llevas lo del último nivel seguro. ¡Inténtalo de nuevo o aprende más en la plataforma!';
+    }
+  }
+  // --- comodines ---
+  $('btn-5050').addEventListener('click', function(){
+    if (used5050 || locked) return; used5050 = true; this.disabled = true; playSound('spray');
+    var q = questions[level];
+    var wrong = [].slice.call(box.querySelectorAll('.opt')).filter(function(b){ return +b.dataset.orig !== q.correct; });
+    wrong.sort(function(){ return Math.random() - .5; }).slice(0,2).forEach(function(b){
+      var r = b.getBoundingClientRect(), p = document.createElement('img'); p.src = AEROSOL; p.alt=''; p.className='puff';
+      p.style.left = (r.left + r.width/2 - 60) + 'px'; p.style.top = (r.top - 50) + 'px'; document.body.appendChild(p);
+      setTimeout(function(){ p.remove(); b.classList.add('gone'); }, 600);
+    });
+  });
+  $('btn-audience').addEventListener('click', function(){
+    if (usedAudience || locked) return; usedAudience = true; this.disabled = true;
+    var q = questions[level], vis = [].slice.call(box.querySelectorAll('.opt:not(.gone)'));
+    var pct = {}, rest = 100, main = 40 + Math.floor(Math.random()*30); pct[q.correct] = main; rest -= main;
+    var others = vis.filter(function(b){ return +b.dataset.orig !== q.correct; });
+    others.forEach(function(b,i){ var v = i === others.length-1 ? rest : Math.floor(Math.random()*rest*0.7); pct[b.dataset.orig] = v; rest -= v; });
+    $('bars').innerHTML = [].slice.call(box.querySelectorAll('.opt')).map(function(b,pos){
+      var v = pct[b.dataset.orig] || 0; return '<div><small>'+v+'%</small><i data-h="'+(v*1.5)+'"></i>'+String.fromCharCode(65+pos)+'</div>';
+    }).join('');
+    $('audience').classList.add('show');
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){ $('bars').querySelectorAll('i').forEach(function(i){ i.style.height = i.dataset.h + 'px'; }); }); });
+    $('aud-close').focus();
+  });
+  $('aud-close').addEventListener('click', function(){ $('audience').classList.remove('show'); });
+
+  function confetti(n){
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var colors = ['#F59E0B','#FDE68A','#15803D','#38BDF8','#FFFFFF','#E11D48'];
+    for (var i=0;i<n;i++){ var c = document.createElement('i'); c.className='confetti'; c.style.left=Math.random()*100+'vw'; c.style.background=colors[i%colors.length]; c.style.setProperty('--dx',(Math.random()*160-80)+'px'); c.style.animationDuration=(1.8+Math.random()*1.6)+'s'; c.style.animationDelay=(Math.random()*.5)+'s'; document.body.appendChild(c); setTimeout(function(el){ return function(){ el.remove(); }; }(c), 4500); }
+  }
+  function start(){ level = 0; used5050 = false; usedAudience = false; $('btn-5050').disabled = false; $('btn-audience').disabled = false; $('end').classList.remove('show'); $('main').hidden = false; $('ladder').hidden = false; loadQuestion(); }
+  function close(){ if (window.parent !== window) { window.parent.postMessage('dm-close', '*'); start(); } else { window.location.href = '/'; } }
+  game.classList.add('open'); ac(); start();
+  window.addEventListener('message', function(e){ if (e.data === 'dm-open') { start(); $('close').focus(); } });
+  $('again').addEventListener('click', start);
+  $('close').addEventListener('click', close);
+  $('mute').addEventListener('click', function(){ muted = !muted; this.textContent = muted ? '🔇' : '🔊'; this.setAttribute('aria-label', muted ? 'Activar sonido' : 'Silenciar sonido'); });
+  document.addEventListener('keydown', function(e){ if (e.key !== 'Escape') return; if ($('audience').classList.contains('show')) $('audience').classList.remove('show'); else close(); });
+})();
+</script>
+</body>
+</html>
