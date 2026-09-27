@@ -8,7 +8,7 @@
 <link rel="icon" href="/favicon.ico">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;600;700;800&family=Gochi+Hand&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;600;700;800&family=Gochi+Hand&family=Roboto:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
 :root{
   --paper:#FFFBF3; --white:#FFFFFF; --ink:#1F2A1E; --ink2:#4E5A4B; --muted:#6B5E45;
@@ -194,6 +194,28 @@ footer{background:var(--green-dk);color:#E3F2DC;position:relative}
 .modal-close{position:absolute;top:12px;right:12px;width:44px;height:44px;border-radius:50%;border:0;background:rgba(255,255,255,.9);color:var(--ink);cursor:pointer;display:grid;place-items:center}
 .modal-close svg{width:20px;height:20px}
 
+/* Dengue Millonario (sección) */
+.dm-sec{padding:30px 0 70px;text-align:center}
+.dm-sec .eyebrow{align-self:center;align-items:center}
+.dm-card{position:relative;margin-top:26px;border-radius:40px;overflow:hidden;background:radial-gradient(circle at 70% 40%,#123056 0%,#0B192C 45%,#02040A 100%);color:#fff;display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:center;padding:0 56px 0 0;min-height:430px;text-align:left;box-shadow:0 26px 60px rgba(2,4,10,.3)}
+.dm-band{position:absolute;left:0;right:0;height:12px;background-image:repeating-linear-gradient(-45deg,#fff 0 10px,#0B0B0B 10px 20px)}
+.dm-art{position:relative;height:430px}
+.dm-spot{position:absolute;inset:0;background:conic-gradient(from 180deg at 50% -20%,transparent 0 160deg,rgba(56,189,248,.18) 170deg,rgba(245,158,11,.14) 190deg,transparent 200deg)}
+.dm-disc{position:absolute;left:50%;top:50%;width:250px;height:250px;margin:-135px 0 0 -125px;border-radius:50%;background:radial-gradient(circle,#FFFBF3 60%,#F3E9D2);display:grid;place-items:center;box-shadow:0 0 0 6px #F59E0B,0 0 60px rgba(245,158,11,.45)}
+.dm-disc img{width:170px;animation:bob 3.5s ease-in-out infinite}
+.dm-q{position:absolute;font-family:'Roboto',system-ui,sans-serif;font-weight:900;font-size:80px;color:#F59E0B;text-shadow:0 0 24px rgba(245,158,11,.6);animation:bob 4s ease-in-out infinite}
+.dm-coin{position:absolute;right:6%;bottom:12%;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FDE68A,#F59E0B 55%,#B45309);display:grid;place-items:center;font-family:'Roboto',system-ui,sans-serif;font-weight:900;color:#3B2300;font-size:20px;box-shadow:0 0 50px rgba(245,158,11,.55),inset 0 -6px 0 rgba(0,0,0,.2);rotate:-8deg;animation:bob 4s ease-in-out infinite}
+.dm-logo{display:flex;align-items:center;gap:12px;font-family:'Roboto',system-ui,sans-serif;font-weight:900;letter-spacing:4px;color:#F59E0B;font-size:clamp(28px,3.4vw,44px);line-height:1;text-shadow:0 0 24px rgba(245,158,11,.45)}
+.dm-logo img{width:64px;height:64px;object-fit:contain;padding:6px;border-radius:50%;background:#FFFBF3;box-shadow:0 0 0 3px #F59E0B}
+.dm-card p{margin:16px 0 22px;font-size:18px;font-weight:700;line-height:1.6;color:#C7D6EE;max-width:44ch}
+.dm-chips{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:26px}
+.dm-chips span{padding:8px 14px;border-radius:999px;border:1px solid rgba(245,158,11,.5);color:#FDE68A;font-weight:800;font-size:14px;background:rgba(245,158,11,.08)}
+.dm-play{display:inline-flex;align-items:center;gap:12px;height:62px;padding:0 34px;border:0;border-radius:999px;background:linear-gradient(180deg,#FBBF24,#D97706);color:#1F1300;font-family:'Roboto',system-ui,sans-serif;font-weight:900;letter-spacing:1px;font-size:20px;animation:dmring 2.2s ease-out infinite}
+@keyframes dmring{0%{box-shadow:0 0 0 0 rgba(245,158,11,.55)}100%{box-shadow:0 0 0 22px rgba(245,158,11,0)}}
+.dm-overlay{position:fixed;inset:0;z-index:60;display:none;background:#02040A}
+.dm-overlay.open{display:block}
+.dm-overlay iframe{width:100%;height:100%;border:0;display:block}
+
 /* zancudos interactivos */
 .sprayable{cursor:pointer;pointer-events:auto;transition:opacity .4s ease}
 .sprayable.gone{opacity:0;pointer-events:none}
@@ -237,6 +259,8 @@ footer{background:var(--green-dk);color:#E3F2DC;position:relative}
   .eyebrow span{font-size:23px}
   .txt{font-size:16px}
   .rows{gap:80px}
+  .dm-card{grid-template-columns:1fr;padding:30px 24px 40px}
+  .dm-art{height:260px}
 }
 @media (min-width:1024px){.nav .close{display:none}}
 @media (prefers-reduced-motion:reduce){
@@ -283,6 +307,24 @@ footer{background:var(--green-dk);color:#E3F2DC;position:relative}
 <img class="book bob" src="/landing/dengue1.webp" alt="Páginas ilustradas del libro Los invasores">
 <img class="za sprayable fly1" src="/landing/zancudo_1.png" alt="" aria-hidden="true">
 <img class="zb sprayable fly2" src="/landing/zancudo_2.png" alt="" aria-hidden="true">
+</div>
+</div>
+</section>
+
+<section class="dm-sec" id="juego">
+<div class="wrap">
+<div class="eyebrow reveal"><span>Antes de entrar…</span><svg viewBox="0 0 120 10" aria-hidden="true"><path d="M2 6 C 30 1, 60 9, 118 4" stroke-width="3" fill="none" stroke-linecap="round"/></svg></div>
+<h2 class="reveal" style="--rd:.1s">¿Cuánto sabes del dengue?</h2>
+<div class="dm-card reveal" style="--rd:.2s">
+<div class="dm-band" style="top:0" aria-hidden="true"></div>
+<div class="dm-art" aria-hidden="true"><div class="dm-spot"></div><div class="dm-disc"><img src="/landing/zancudo_1.png" alt=""></div><span class="dm-q" style="left:14%;top:14%">?</span><span class="dm-q" style="left:70%;top:8%;font-size:60px;animation-delay:-1s">?</span><span class="dm-q" style="left:10%;top:66%;font-size:44px;animation-delay:-2s">?</span><div class="dm-coin">$1.000.000</div></div>
+<div>
+<div class="dm-logo"><img src="/landing/zancudo_1.png" alt="">DENGUE<br>MILLONARIO</div>
+<p>Responde las 15 preguntas, usa tus comodines y llega al millón. Si fallas, empiezas de nuevo.</p>
+<div class="dm-chips"><span>15 preguntas</span><span>50:50</span><span>Público</span><span>🔊 Con sonido</span></div>
+<button class="dm-play" type="button" id="dmPlay">▶ JUGAR</button>
+</div>
+<div class="dm-band" style="bottom:0" aria-hidden="true"></div>
 </div>
 </div>
 </section>
@@ -426,6 +468,7 @@ footer{background:var(--green-dk);color:#E3F2DC;position:relative}
 </footer>
 </div>
 
+<div class="dm-overlay" id="dmOverlay" role="dialog" aria-modal="true" aria-label="Dengue Millonario"><iframe title="Dengue Millonario" allow="autoplay" loading="lazy" src="/landing/millonario.html"></iframe></div>
 <div class="swarm" id="swarm" aria-hidden="true"></div>
 
 <div class="modal" id="videoModal" role="dialog" aria-modal="true" aria-label="Video Edúcate contra el dengue">
@@ -561,6 +604,16 @@ footer{background:var(--green-dk);color:#E3F2DC;position:relative}
 
   // Pega aquí el ID de tu formulario de Formspree (lo que va después de formspree.io/f/)
   var FORMSPREE_ID = 'xeaozryn';
+
+  // --- Dengue Millonario ---
+  var dmO = document.getElementById('dmOverlay'), dmBtn = document.getElementById('dmPlay');
+  dmBtn.addEventListener('click', function(){
+    var fr = dmO.querySelector('iframe');
+    dmO.classList.add('open'); document.body.style.overflow = 'hidden';
+    try { fr.contentWindow.postMessage('dm-open', '*'); } catch(e) {}
+    setTimeout(function(){ try { fr.focus(); } catch(e) {} }, 80);
+  });
+  window.addEventListener('message', function(e){ if (e.data === 'dm-close') { dmO.classList.remove('open'); document.body.style.overflow = ''; dmBtn.focus(); } });
 
   var form = document.getElementById('form'), status = document.getElementById('status');
   form.addEventListener('submit', function(e){
