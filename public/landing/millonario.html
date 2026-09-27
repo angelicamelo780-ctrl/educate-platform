@@ -199,6 +199,15 @@ button{font:inherit;cursor:pointer}
     </div>
     <div class="ladder" id="ladder" aria-label="Escalera de premios"></div>
 
+    <section class="screen" id="intro">
+      <div class="card">
+        <div class="host" style="width:170px;height:170px"><img src="/landing/zancudo_1.png" alt="" style="width:120px"></div>
+        <h2>¿Listo para ganar <span>el millón?</span></h2>
+        <p>15 preguntas sobre el dengue. Tienes dos comodines: <b>50:50</b> y <b>Público</b>. Si fallas, se acaba el juego.</p>
+        <p style="font-size:15px;color:#FDE68A">🔊 Sube el volumen: el juego tiene música.</p>
+        <button class="btn-g" type="button" id="begin">▶ COMENZAR</button>
+      </div>
+    </section>
     <section class="screen" id="end">
       <div class="card">
         <span id="end-emoji" style="font-size:64px"></span>
@@ -423,6 +432,11 @@ button{font:inherit;cursor:pointer}
   // --- Música de suspenso original (Web Audio): tambor de corazón que acelera con cada nivel, drone grave y brillo agudo ---
   var music = (function(){
     var timer = null, nodes = [], beat = 0;
+    // Pista de la pregunta (archivo MP3). Si no carga, se usa la música generada.
+    var track = null, trackOk = false;
+    try { track = new Audio('/landing/pregunta.mp3'); track.loop = true; track.preload = 'auto'; track.volume = 0.55;
+      track.addEventListener('canplaythrough', function(){ trackOk = true; }, { once: true });
+      track.addEventListener('error', function(){ trackOk = false; }); } catch(e) {}
     function stopNodes(){ nodes.forEach(function(n){ try { n.stop(); } catch(e){} }); nodes = []; }
     function thump(c, t, f, v){ var o = c.createOscillator(), g = c.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(f, t); o.frequency.exponentialRampToValueAtTime(f*0.5, t+0.18); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v, t+0.01); g.gain.exponentialRampToValueAtTime(0.0001, t+0.22); o.connect(g).connect(c.destination); o.start(t); o.stop(t+0.25); }
     function sting(c){ var t = c.currentTime; // entrada de pregunta: golpe grave + barrido
@@ -436,11 +450,13 @@ button{font:inherit;cursor:pointer}
         lfo.frequency.value = 0.25 + i*0.1; lg.gain.value = g.gain.value*0.6; lfo.connect(lg).connect(g.gain);
         o.connect(g).connect(c.destination); o.start(); lfo.start(); nodes.push(o, lfo); }); }
     return {
-      start: function(lvl){ this.stop(); var c = ac(); if (!c || muted) return; sting(c); drone(c, lvl);
+      start: function(lvl){ this.stop(); var c = ac(); if (!c || muted) return;
+        if (track && (trackOk || track.readyState >= 3)) { try { track.currentTime = 0; var pr = track.play(); if (pr && pr.catch) pr.catch(function(){}); } catch(e) {} return; }
+        sting(c); drone(c, lvl);
         var bpm = 62 + lvl*4, ms = 60000 / bpm; beat = 0;
         timer = setInterval(function(){ if (muted) return; var t = c.currentTime + 0.02; thump(c, t, 60, 0.35); thump(c, t+0.16, 55, 0.22); beat++;
           if (beat % 4 === 0) { var o = c.createOscillator(), g = c.createGain(); o.type='triangle'; o.frequency.value = 880 + lvl*20; g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.025,t+0.05); g.gain.exponentialRampToValueAtTime(0.0001,t+0.6); o.connect(g).connect(c.destination); o.start(t); o.stop(t+0.65); } }, ms); },
-      stop: function(){ if (timer) { clearInterval(timer); timer = null; } stopNodes(); },
+      stop: function(){ if (timer) { clearInterval(timer); timer = null; } stopNodes(); if (track) { try { track.pause(); } catch(e) {} } },
       finalAnswer: function(){ this.stop(); var c = ac(); if (!c || muted) return; var t = c.currentTime; // "¿respuesta final?": subida tensa
         var o = c.createOscillator(), g = c.createGain(); o.type = 'sawtooth'; o.frequency.setValueAtTime(110, t); o.frequency.exponentialRampToValueAtTime(440, t+1.1);
         var lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.setValueAtTime(400, t); lp.frequency.exponentialRampToValueAtTime(2400, t+1.1);
@@ -539,10 +555,14 @@ button{font:inherit;cursor:pointer}
     var colors = ['#F59E0B','#FDE68A','#15803D','#38BDF8','#FFFFFF','#E11D48'];
     for (var i=0;i<n;i++){ var c = document.createElement('i'); c.className='confetti'; c.style.left=Math.random()*100+'vw'; c.style.background=colors[i%colors.length]; c.style.setProperty('--dx',(Math.random()*160-80)+'px'); c.style.animationDuration=(1.8+Math.random()*1.6)+'s'; c.style.animationDelay=(Math.random()*.5)+'s'; document.body.appendChild(c); setTimeout(function(el){ return function(){ el.remove(); }; }(c), 4500); }
   }
+  function showIntro(){ music.stop(); $('end').classList.remove('show'); $('main').hidden = true; $('ladder').hidden = true; $('intro').classList.add('show'); $('begin').focus({preventScroll:true}); }
+  $('begin').addEventListener('click', function(){ var c = ac(); if (c && c.state === 'suspended') c.resume(); $('intro').classList.remove('show'); start(); });
+  // Cualquier toque dentro del juego reactiva el sonido si el navegador lo había pausado
+  document.addEventListener('pointerdown', function(){ var c = ac(); if (c && c.state === 'suspended') c.resume(); }, true);
   function start(){ level = 0; used5050 = false; usedAudience = false; $('btn-5050').disabled = false; $('btn-audience').disabled = false; $('end').classList.remove('show'); $('main').hidden = false; $('ladder').hidden = false; loadQuestion(); }
-  function close(){ music.stop(); if (window.parent !== window) { window.parent.postMessage('dm-close', '*'); start(); } else { window.location.href = '/'; } }
-  game.classList.add('open'); ac(); start();
-  window.addEventListener('message', function(e){ if (e.data === 'dm-open') { start(); $('close').focus(); } });
+  function close(){ music.stop(); if (window.parent !== window) { window.parent.postMessage('dm-close', '*'); showIntro(); } else { window.location.href = '/'; } }
+  game.classList.add('open'); showIntro();
+  window.addEventListener('message', function(e){ if (e.data === 'dm-open') { showIntro(); } });
   $('again').addEventListener('click', start);
   $('close').addEventListener('click', close);
   $('mute').addEventListener('click', function(){ muted = !muted; if (muted) music.stop(); else if (!$('main').hidden && !locked) music.start(level); this.textContent = muted ? '🔇' : '🔊'; this.setAttribute('aria-label', muted ? 'Activar sonido' : 'Silenciar sonido'); });
