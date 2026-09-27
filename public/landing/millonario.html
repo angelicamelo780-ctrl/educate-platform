@@ -68,8 +68,19 @@ button{font:inherit;cursor:pointer}
 .life:disabled::after{content:"";position:absolute;left:8px;right:8px;top:50%;height:3px;background:var(--bad);transform:rotate(-20deg);border-radius:2px}
 .icon-btn{width:46px;height:46px;border-radius:12px;border:1px solid var(--line);background:rgba(14,35,64,.8);color:#fff;font-size:18px;display:grid;place-items:center}
 .main{display:flex;flex-direction:column;gap:18px;padding-top:22px}
-.stage-art{display:flex;justify-content:center;height:120px;position:relative}
-.stage-art img{height:120px;width:auto;filter:drop-shadow(0 10px 20px rgba(0,0,0,.6))}
+.stage-art{display:flex;justify-content:center;align-items:center;min-height:150px;position:relative}
+.stage-art .beam{position:absolute;left:50%;top:-40px;width:340px;height:230px;margin-left:-170px;background:radial-gradient(ellipse at 50% 0%,rgba(253,230,138,.35),transparent 70%);clip-path:polygon(40% 0,60% 0,100% 100%,0 100%);pointer-events:none}
+.host{position:relative;width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,#FFFBF3 60%,#F3E9D2);display:grid;place-items:center;box-shadow:0 0 0 5px var(--gold),0 0 50px rgba(245,158,11,.5);animation:hostpulse 2.4s ease-in-out infinite}
+.host img{width:100px;animation:bob 3.5s ease-in-out infinite}
+.host.hit{animation:none;box-shadow:0 0 0 5px var(--ok),0 0 60px rgba(74,222,128,.6)}
+.host.hit img{animation:flee 1.3s cubic-bezier(.5,0,.8,.5) forwards}
+@keyframes flee{0%{translate:0 0;rotate:0deg;opacity:1}25%{translate:-10px -14px;rotate:-25deg}100%{translate:420px -260px;rotate:540deg;scale:.3;opacity:0}}
+@keyframes hostpulse{50%{box-shadow:0 0 0 5px var(--gold2),0 0 80px rgba(245,158,11,.75)}}
+.qimg{position:relative;width:190px;height:140px;border-radius:24px;padding:4px;background:linear-gradient(135deg,var(--gold2),var(--amber));box-shadow:0 0 40px rgba(245,158,11,.35);animation:pop .4s ease}
+.qimg > div{width:100%;height:100%;border-radius:20px;background:#FFFBF3;display:grid;place-items:center;overflow:hidden}
+.qimg img{width:100%;height:100%;object-fit:cover}
+.qimg .emo{font-size:72px;line-height:1}
+.qimg .tag{position:absolute;left:50%;bottom:-12px;transform:translateX(-50%);padding:3px 12px;border-radius:999px;background:#0B192C;border:1px solid var(--gold);color:var(--gold2);font-size:11px;font-weight:900;letter-spacing:1.5px;white-space:nowrap}
 /* caja de pregunta con forma hexagonal y línea del show */
 .rail{position:relative}
 .rail::before{content:"";position:absolute;left:-24px;right:-24px;top:50%;height:2px;background:linear-gradient(90deg,transparent,var(--gold) 12%,var(--gold) 88%,transparent);opacity:.6}
@@ -181,7 +192,7 @@ button{font:inherit;cursor:pointer}
     </div>
 
     <div class="main" id="main">
-      <div class="stage-art" aria-hidden="true"><img src="/landing/we_want_image.webp" alt=""></div>
+      <div class="stage-art" id="stage" aria-hidden="true"></div>
       <div class="rail"><div class="qhex"><div><div class="qlvl" id="qlvl"></div><p class="q" id="question-text" aria-live="polite">Cargando pregunta...</p></div></div></div>
       <div class="opts" id="options-container"></div>
       <div class="explain" id="explanation-box" role="status"><span class="ic" id="ex-ic"></span><div id="explanation-text"></div><button class="next" type="button" id="next-btn">Siguiente Nivel ➔</button></div>
@@ -381,6 +392,19 @@ button{font:inherit;cursor:pointer}
   var SAFE = [4, 9, 14];
   var AEROSOL = '/landing/aerosol.svg';
   var $ = function(id){ return document.getElementById(id); };
+  // Escenario: el zancudo del libro en el foco dorado. Al acertar, lo espanta el aerosol y vuelve en la siguiente pregunta.
+  function renderStage(){
+    var s = $('stage'); if (!s) return;
+    s.innerHTML = '<div class="beam"></div><div class="host" id="host"><img src="/landing/zancudo_1.png" alt=""></div>';
+  }
+  function sprayHost(){
+    var h = $('host'); if (!h) return;
+    var r = h.getBoundingClientRect(), p = document.createElement('img');
+    p.src = AEROSOL; p.alt = ''; p.className = 'puff'; p.style.width = '260px';
+    p.style.left = (r.left + r.width/2 - 80) + 'px'; p.style.top = (r.top + r.height/2 - 80) + 'px';
+    document.body.appendChild(p); setTimeout(function(){ p.remove(); }, 1100);
+    playSound('spray'); h.classList.add('hit');
+  }
   var game = $('game'), box = $('options-container');
   var level = 0, order = [], used5050 = false, usedAudience = false, locked = false, muted = false, lastFocus = null;
 
@@ -396,6 +420,36 @@ button{font:inherit;cursor:pointer}
     else if (type === 'spray') { var n=c.sampleRate*0.35, b=c.createBuffer(1,n,c.sampleRate), d=b.getChannelData(0); for (var i=0;i<n;i++) d[i]=Math.random()*2-1; var s=c.createBufferSource(); s.buffer=b; var hp=c.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=3000; var g2=c.createGain(); g2.gain.setValueAtTime(0.25,now); g2.gain.exponentialRampToValueAtTime(0.0001,now+0.35); s.connect(hp).connect(g2).connect(c.destination); s.start(); }
   }
 
+  // --- Música de suspenso original (Web Audio): tambor de corazón que acelera con cada nivel, drone grave y brillo agudo ---
+  var music = (function(){
+    var timer = null, nodes = [], beat = 0;
+    function stopNodes(){ nodes.forEach(function(n){ try { n.stop(); } catch(e){} }); nodes = []; }
+    function thump(c, t, f, v){ var o = c.createOscillator(), g = c.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(f, t); o.frequency.exponentialRampToValueAtTime(f*0.5, t+0.18); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v, t+0.01); g.gain.exponentialRampToValueAtTime(0.0001, t+0.22); o.connect(g).connect(c.destination); o.start(t); o.stop(t+0.25); }
+    function sting(c){ var t = c.currentTime; // entrada de pregunta: golpe grave + barrido
+      thump(c, t, 90, 0.5);
+      var n = c.sampleRate*0.6, b = c.createBuffer(1,n,c.sampleRate), d = b.getChannelData(0); for (var i=0;i<n;i++) d[i]=(Math.random()*2-1)*(1-i/n);
+      var s = c.createBufferSource(); s.buffer = b; var bp = c.createBiquadFilter(); bp.type='bandpass'; bp.Q.value = 2; bp.frequency.setValueAtTime(400,t); bp.frequency.exponentialRampToValueAtTime(3000,t+0.6);
+      var g = c.createGain(); g.gain.value = 0.08; s.connect(bp).connect(g).connect(c.destination); s.start(t); }
+    function drone(c, lvl){ var base = [55, 58.27, 61.74][Math.min(2, Math.floor(lvl/5))];
+      [base, base*2, base*3.01].forEach(function(f, i){ var o = c.createOscillator(), g = c.createGain(), lfo = c.createOscillator(), lg = c.createGain();
+        o.type = i === 2 ? 'triangle' : 'sine'; o.frequency.value = f; g.gain.value = [0.06, 0.035, 0.012][i];
+        lfo.frequency.value = 0.25 + i*0.1; lg.gain.value = g.gain.value*0.6; lfo.connect(lg).connect(g.gain);
+        o.connect(g).connect(c.destination); o.start(); lfo.start(); nodes.push(o, lfo); }); }
+    return {
+      start: function(lvl){ this.stop(); var c = ac(); if (!c || muted) return; sting(c); drone(c, lvl);
+        var bpm = 62 + lvl*4, ms = 60000 / bpm; beat = 0;
+        timer = setInterval(function(){ if (muted) return; var t = c.currentTime + 0.02; thump(c, t, 60, 0.35); thump(c, t+0.16, 55, 0.22); beat++;
+          if (beat % 4 === 0) { var o = c.createOscillator(), g = c.createGain(); o.type='triangle'; o.frequency.value = 880 + lvl*20; g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.025,t+0.05); g.gain.exponentialRampToValueAtTime(0.0001,t+0.6); o.connect(g).connect(c.destination); o.start(t); o.stop(t+0.65); } }, ms); },
+      stop: function(){ if (timer) { clearInterval(timer); timer = null; } stopNodes(); },
+      finalAnswer: function(){ this.stop(); var c = ac(); if (!c || muted) return; var t = c.currentTime; // "¿respuesta final?": subida tensa
+        var o = c.createOscillator(), g = c.createGain(); o.type = 'sawtooth'; o.frequency.setValueAtTime(110, t); o.frequency.exponentialRampToValueAtTime(440, t+1.1);
+        var lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.setValueAtTime(400, t); lp.frequency.exponentialRampToValueAtTime(2400, t+1.1);
+        g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.09, t+0.9); g.gain.exponentialRampToValueAtTime(0.0001, t+1.2);
+        o.connect(lp).connect(g).connect(c.destination); o.start(t); o.stop(t+1.25);
+        [0, 0.35, 0.6, 0.8, 0.95, 1.05].forEach(function(dt){ thump(c, t+dt, 70, 0.3); }); }
+    };
+  })();
+
   function renderLadder(){
     var el = $('ladder');
     el.innerHTML = '<div class="top-prize">🏆 EL MILLÓN</div>' + moneyLadder.map(function(m,i){
@@ -409,6 +463,7 @@ button{font:inherit;cursor:pointer}
     var q = questions[level]; locked = false;
     $('qlvl').textContent = 'PREGUNTA ' + (level+1) + ' · POR ' + moneyLadder[level];
     $('question-text').textContent = q.q;
+    renderStage(); music.start(level);
     $('explanation-box').classList.remove('show');
     order = shuffle(q.options.length);
     box.innerHTML = order.map(function(orig, pos){
@@ -418,7 +473,7 @@ button{font:inherit;cursor:pointer}
   }
   box.addEventListener('click', function(e){
     var btn = e.target.closest('.opt'); if (!btn || locked) return;
-    locked = true; playSound('select');
+    locked = true; music.finalAnswer();
     box.querySelectorAll('.opt').forEach(function(b){ b.disabled = true; });
     btn.classList.add('pick');
     setTimeout(function(){ check(btn); }, 1200);
@@ -428,7 +483,7 @@ button{font:inherit;cursor:pointer}
     btn.classList.remove('pick');
     var correctBtn = box.querySelector('.opt[data-orig="'+q.correct+'"]');
     var letter = String.fromCharCode(65 + order.indexOf(q.correct));
-    if (ok) { playSound('correct'); btn.classList.add('ok'); explain('¡Correcto!', q.explanation, false); }
+    if (ok) { playSound('correct'); btn.classList.add('ok'); setTimeout(sprayHost, 250); explain('¡Correcto!', q.explanation, false); }
     else { playSound('wrong'); btn.classList.add('bad'); correctBtn.classList.add('ok'); explain('Incorrecto. La respuesta correcta era la ' + letter + '.', q.explanation, true); }
   }
   function explain(head, text, over){
@@ -441,6 +496,7 @@ button{font:inherit;cursor:pointer}
     $('explanation-box').classList.add('show'); nb.focus({preventScroll:true});
   }
   function end(won){
+    music.stop();
     $('main').hidden = true; $('ladder').hidden = true; $('end').classList.add('show');
     var kept = '$0'; SAFE.forEach(function(s){ if (level > s) kept = moneyLadder[s]; });
     if (won) {
@@ -484,12 +540,12 @@ button{font:inherit;cursor:pointer}
     for (var i=0;i<n;i++){ var c = document.createElement('i'); c.className='confetti'; c.style.left=Math.random()*100+'vw'; c.style.background=colors[i%colors.length]; c.style.setProperty('--dx',(Math.random()*160-80)+'px'); c.style.animationDuration=(1.8+Math.random()*1.6)+'s'; c.style.animationDelay=(Math.random()*.5)+'s'; document.body.appendChild(c); setTimeout(function(el){ return function(){ el.remove(); }; }(c), 4500); }
   }
   function start(){ level = 0; used5050 = false; usedAudience = false; $('btn-5050').disabled = false; $('btn-audience').disabled = false; $('end').classList.remove('show'); $('main').hidden = false; $('ladder').hidden = false; loadQuestion(); }
-  function close(){ if (window.parent !== window) { window.parent.postMessage('dm-close', '*'); start(); } else { window.location.href = '/'; } }
+  function close(){ music.stop(); if (window.parent !== window) { window.parent.postMessage('dm-close', '*'); start(); } else { window.location.href = '/'; } }
   game.classList.add('open'); ac(); start();
   window.addEventListener('message', function(e){ if (e.data === 'dm-open') { start(); $('close').focus(); } });
   $('again').addEventListener('click', start);
   $('close').addEventListener('click', close);
-  $('mute').addEventListener('click', function(){ muted = !muted; this.textContent = muted ? '🔇' : '🔊'; this.setAttribute('aria-label', muted ? 'Activar sonido' : 'Silenciar sonido'); });
+  $('mute').addEventListener('click', function(){ muted = !muted; if (muted) music.stop(); else if (!$('main').hidden && !locked) music.start(level); this.textContent = muted ? '🔇' : '🔊'; this.setAttribute('aria-label', muted ? 'Activar sonido' : 'Silenciar sonido'); });
   document.addEventListener('keydown', function(e){ if (e.key !== 'Escape') return; if ($('audience').classList.contains('show')) $('audience').classList.remove('show'); else close(); });
 })();
 </script>
