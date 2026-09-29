@@ -293,16 +293,47 @@ export function buscarExacta(token: string): Palabra | undefined {
 // Palabras del texto (letras con tildes y ñ).
 export const TOKEN_RE = /[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+/g;
 
-export function hablar(texto: string) {
+// Voz del diccionario: primero intenta el audio pregrabado con la voz colombiana
+// "Gonzalo" (public/audio/diccionario/<palabra>.mp3). Si no existe, usa la voz del
+// navegador, prefiriendo una voz de Colombia y las voces "naturales".
+export function slugPalabra(palabra: string) {
+  return palabra.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
+
+let audioActual: HTMLAudioElement | null = null;
+
+function detener() {
+  try { window.speechSynthesis.cancel(); } catch { /* sin síntesis */ }
+  if (audioActual) { audioActual.pause(); audioActual = null; }
+}
+
+function vozDelNavegador(texto: string) {
   try {
-    window.speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(texto);
     u.lang = "es-CO";
     u.rate = 0.92;
-    const voz = window.speechSynthesis.getVoices().find((v) => v.lang.startsWith("es"));
+    const voces = window.speechSynthesis.getVoices().filter((v) => v.lang.toLowerCase().startsWith("es"));
+    const natural = (v: SpeechSynthesisVoice) => /natural|neural|online|google/i.test(v.name);
+    const voz =
+      voces.find((v) => /co/i.test(v.lang) && natural(v)) ||
+      voces.find((v) => /co/i.test(v.lang)) ||
+      voces.find(natural) ||
+      voces[0];
     if (voz) u.voice = voz;
     window.speechSynthesis.speak(u);
   } catch {
     // Sin síntesis de voz en este navegador: simplemente no suena.
   }
+}
+
+export function hablar(texto: string) {
+  detener();
+  // Las llamadas del diccionario y del lector usan el formato "Palabra. definición".
+  const palabra = texto.split(".")[0]?.trim();
+  const p = palabra ? buscarExacta(palabra) : undefined;
+  if (!p || typeof Audio === "undefined") { vozDelNavegador(texto); return; }
+  const audio = new Audio(`/audio/diccionario/${slugPalabra(p.palabra)}.mp3`);
+  audioActual = audio;
+  audio.play().catch(() => { if (audioActual === audio) { audioActual = null; vozDelNavegador(texto); } });
+  audio.onerror = () => { if (audioActual === audio) { audioActual = null; vozDelNavegador(texto); } };
 }
